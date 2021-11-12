@@ -1,3 +1,5 @@
+[![Licensed](https://github.com/Stagie/setup-dotnet/actions/workflows/licensed.yml/badge.svg)](https://github.com/Stagie/setup-dotnet/actions/workflows/licensed.yml)
+
 # setup-dotnet
 
 <p align="left">
