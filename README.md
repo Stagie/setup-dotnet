@@ -2,13 +2,11 @@
 
 # setup-dotnet
 
-<p align="left">
-  <a href="https://github.com/actions/setup-dotnet"><img alt="GitHub Actions status" src="https://github.com/actions/setup-dotnet/workflows/Main%20workflow/badge.svg"></a>
-</p>
+[![GitHub Actions Status](https://github.com/actions/setup-dotnet/workflows/Main%20workflow/badge.svg)](https://github.com/actions/setup-dotnet)
 
 This action sets up a [.NET CLI](https://github.com/dotnet/sdk) environment for use in actions by:
 
-- optionally downloading and caching a version of dotnet by SDK version and adding to PATH
+- optionally downloading and caching a version(s) of dotnet by SDK version(s) and adding to PATH
 - registering problem matchers for error output
 - setting up authentication to private package sources like GitHub Packages
 
@@ -25,22 +23,45 @@ See [action.yml](action.yml)
 Basic:
 ```yaml
 steps:
-- uses: actions/checkout@v2
-- uses: actions/setup-dotnet@v1
+- uses: actions/checkout@v3
+- uses: actions/setup-dotnet@v2
   with:
     dotnet-version: '3.1.x' # SDK Version to use; x will use the latest version of the 3.1 channel
 - run: dotnet build <my project>
 ```
+Multiple versions:
+> Note: In case multiple versions are installed, the latest .NET version will be used by default unless another version is specified in the `global.json` file.
 
+```yml
+steps:
+- uses: actions/checkout@v3
+- name: Setup dotnet
+  uses: actions/setup-dotnet@v2
+  with:
+    dotnet-version: | 
+      3.1.x
+      5.0.x
+- run: dotnet build <my project>
+```
 Preview version:
 ```yml
 steps:
-- uses: actions/checkout@v2
-- uses: actions/setup-dotnet@v1
+- uses: actions/checkout@v3
+- uses: actions/setup-dotnet@v2
   with:
     dotnet-version: '6.0.x'
     include-prerelease: true
 - run: dotnet build <my project>
+```
+global.json in a subdirectory:
+```yml
+steps:
+- uses: actions/checkout@v3
+- uses: actions/setup-dotnet@v2
+  with:
+    global-json-file: csharp/global.json
+- run: dotnet build <my project>
+  working-directory: csharp
 ```
 
 Matrix Testing:
@@ -53,9 +74,9 @@ jobs:
         dotnet: [ '2.1.x', '3.1.x', '5.0.x' ]
     name: Dotnet ${{ matrix.dotnet }} sample
     steps:
-      - uses: actions/checkout@v2
+      - uses: actions/checkout@v3
       - name: Setup dotnet
-        uses: actions/setup-dotnet@v1
+        uses: actions/setup-dotnet@v2
         with:
           dotnet-version: ${{ matrix.dotnet }}
       - run: dotnet build <my project>
@@ -68,15 +89,13 @@ jobs:
     runs-on: ubuntu-latest
     name: Dotnet Side by Side testing sample
     steps:
-      - uses: actions/checkout@v2
+      - uses: actions/checkout@v3
       - name: Setup dotnet
-        uses: actions/setup-dotnet@v1
+        uses: actions/setup-dotnet@v2
         with:
-          dotnet-version: '2.1.x'
-      - name: Setup dotnet
-        uses: actions/setup-dotnet@v1
-        with:
-          dotnet-version: '3.1.x'
+          dotnet-version: |
+            2.1.x
+            3.1.x
       - run: dotnet build <my project>
       - run: dotnet test <my project>
 ```
@@ -84,9 +103,9 @@ jobs:
 Authentication for nuget feeds:
 ```yaml
 steps:
-- uses: actions/checkout@v2
+- uses: actions/checkout@v3
 # Authenticates packages to push to GPR
-- uses: actions/setup-dotnet@v1
+- uses: actions/setup-dotnet@v2
   with:
     dotnet-version: '3.1.x' # SDK Version to use.
     source-url: https://nuget.pkg.github.com/<owner>/index.json
@@ -99,7 +118,7 @@ steps:
   run: dotnet nuget push <my project>/bin/Release/*.nupkg
 
 # Authenticates packages to push to Azure Artifacts
-- uses: actions/setup-dotnet@v1
+- uses: actions/setup-dotnet@v2
   with:
     source-url: https://pkgs.dev.azure.com/<your-organization>/_packaging/<your-feed-name>/nuget/v3/index.json
   env:
@@ -109,7 +128,7 @@ steps:
 
 # Authenticates packages to push to nuget.org.
 # It's only the way to push a package to nuget.org feed for macOS/Linux machines due to API key config store limitations.
-- uses: actions/setup-dotnet@v1
+- uses: actions/setup-dotnet@v2
   with:
     dotnet-version: 3.1.x
 - name: Publish the package to nuget.org
@@ -134,7 +153,7 @@ build:
     DOTNET_NOLOGO: true
   steps:
     - uses: actions/checkout@main
-    - uses: actions/setup-dotnet@v1
+    - uses: actions/setup-dotnet@v2
       with:
         dotnet-version: '3.1.x' # SDK Version to use.
 ```

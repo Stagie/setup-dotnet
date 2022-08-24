@@ -165,6 +165,12 @@ export class DotnetCoreInstaller {
       });
     }
 
+    if (resultCode != 0) {
+      throw new Error(`Failed to install dotnet ${resultCode}. ${output}`);
+    }
+  }
+
+  static addToPath() {
     if (process.env['DOTNET_INSTALL_DIR']) {
       core.addPath(process.env['DOTNET_INSTALL_DIR']);
       core.exportVariable('DOTNET_ROOT', process.env['DOTNET_INSTALL_DIR']);
@@ -189,10 +195,6 @@ export class DotnetCoreInstaller {
     }
 
     console.log(process.env['PATH']);
-
-    if (resultCode != 0) {
-      throw new Error(`Failed to install dotnet ${resultCode}. ${output}`);
-    }
   }
 
   // versionInfo - versionInfo of the SDK/Runtime
@@ -283,7 +285,14 @@ export class DotnetCoreInstaller {
       );
     }
 
-    return releasesInfo[0]['releases.json'];
+    const releaseInfo = releasesInfo[0];
+    if (releaseInfo['support-phase'] === 'eol') {
+      core.warning(
+        `${releaseInfo['product']} ${releaseInfo['channel-version']} is no longer supported and will not receive security updates in the future. Please refer to https://aka.ms/dotnet-core-support for more information about the .NET support policy.`
+      );
+    }
+
+    return releaseInfo['releases.json'];
   }
 
   private version: string;
